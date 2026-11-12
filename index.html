@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>痴恵袋 - みんなの知恵、ちょっとずつ腐ってる</title>
+<style>
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+    background: #f4f1ea;
+    color: #333;
+    line-height: 1.7;
+  }
+  a {
+    color: #0a58ca;
+    cursor: pointer;
+  }
+  header {
+    background: linear-gradient(90deg, #ff8a00, #ffb000);
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+  .head {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 16px;
+    flex-wrap: wrap;
+  }
+  .logo {
+    font-size: 28px;
+    font-weight: 900;
+    cursor: pointer;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.15);
+  }
+  .logo small {
+    display: block;
+    font-size: 11px;
+    font-weight: normal;
+    letter-spacing: 0;
+    opacity: 0.95;
+  }
+  #search {
+    flex: 1;
+    min-width: 180px;
+    padding: 10px 14px;
+    border-radius: 24px;
+    border: none;
+    font-size: 14px;
+    outline: none;
+  }
+  .btn {
+    border: 1px solid #ccc;
+    background: #fff;
+    color: #333;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: inherit;
+    transition: transform 0.1s, background 0.2s;
+  }
+  .btn:hover {
+    background: #f7f7f7;
+  }
+  .btn:active {
+    transform: scale(0.96);
+  }
+  .btn.primary {
+    background: #e0400a;
+    border-color: #e0400a;
+    color: #fff;
+    font-weight: bold;
+  }
+  .btn.primary:hover {
+    background: #c43508;
+  }
+  .btn.small {
+    padding: 4px 10px;
+    font-size: 12px;
+  }
+  .btn.liked {
+    background: #fff3d6;
+    border-color: #ffb000;
+  }
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 20px;
+    padding-top: 20px;
+    padding-bottom: 40px;
+  }
+  @media (max-width: 820px) {
+    .main {
+      grid-template-columns: 1fr;
+    }
+  }
+  .card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+  .list-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .list-head h2 {
+    margin: 0;
+    font-size: 18px;
+  }
+  .qitem {
+    padding: 14px 0;
+    border-bottom: 1px dashed #e3ddd0;
+    cursor: pointer;
+  }
+  .qitem:last-child {
+    border-bottom: none;
+  }
+  .qitem:hover .qtitle {
+    text-decoration: underline;
+  }
+  .qtitle {
+    font-weight: bold;
+    color: #0a58ca;
+    font-size: 15px;
+  }
+  .meta {
+    font-size: 12px;
+    color: #888;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+    align-items: center;
+  }
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    padding: 1px 8px;
+    border-radius: 10px;
+    background: #eee;
+    color: #555;
+  }
+  .badge.solved {
+    background: #e4f5e4;
+    color: #2a7a2a;
+  }
+  .badge.open {
+    background: #ffe9e0;
+    color: #c43508;
+  }
+  .badge.mine {
+    background: #e6efff;
+    color: #2050b0;
+  }
+  .question h1 {
+    font-size: 20px;
+    margin: 6px 0 10px;
+  }
+  .qbody {
+    white-space: normal;
+    font-size: 15px;
+  }
+  .qfoot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 14px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .coin {
+    font-size: 12px;
+    color: #b07a00;
+    background: #fff6dd;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .crumb {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 8px;
+  }
+  .ai {
+    background: linear-gradient(135deg, #f3edff, #eaf4ff);
+    border: 2px solid #b9a4ff;
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .ai-title {
+    font-weight: bold;
+    color: #5a3fc0;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+  .ai-note {
+    font-size: 11px;
+    color: #8a7fb5;
+    margin-top: 10px;
+    border-top: 1px dashed #c9bdf5;
+    padding-top: 6px;
+  }
+  .ai.serious {
+    background: #f0faf4;
+    border-color: #7cc79a;
+  }
+  .ai.serious .ai-title {
+    color: #2a7a4a;
+  }
+  .ans {
+    background: #fff;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    animation: pop 0.35s ease-out;
+  }
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .ans.best {
+    border: 2px solid #f0b400;
+    background: #fffdf3;
+  }
+  .ba {
+    display: inline-block;
+    background: #f0b400;
+    color: #fff;
+    font-weight: bold;
+    font-size: 12px;
+    padding: 2px 10px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+  .ahead {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    flex-wrap: wrap;
+  }
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #f1ece1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+  .rank {
+    font-size: 11px;
+    color: #a06a00;
+    background: #fff3d6;
+    padding: 0 6px;
+    border-radius: 4px;
+  }
+  .time {
+    font-size: 11px;
+    color: #999;
+  }
+  .atext {
+    margin: 10px 0;
+    font-size: 14px;
+  }
+  .aact {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .reported {
+    font-size: 11px;
+    color: #c43508;
+  }
+  .reply {
+    background: #f6f6f6;
+    border-left: 3px solid #ccc;
+    padding: 6px 10px;
+    font-size: 13px;
+    margin: 6px 0 10px;
+    color: #555;
+  }
+  .thanks {
+    background: #fff9e6;
+    border: 1px solid #f3d27a;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+  .typing {
+    text-align: center;
+    color: #999;
+    font-size: 13px;
+    padding: 14px;
+  }
+  .typing .dots::after {
+    content: "";
+    animation: dots 1.2s steps(4) infinite;
+  }
+  @keyframes dots {
+    0% {
+      content: "";
+    }
+    25% {
+      content: "・";
+    }
+    50% {
+      content: "・・";
+    }
+    75% {
+      content: "・・・";
+    }
+  }
+  label {
+    display: block;
+    font-weight: bold;
+    font-size: 13px;
+    margin: 14px 0 4px;
+  }
+  input[type=text],
+  textarea,
+  select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d5cfc2;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    background: #fffefb;
+  }
+  textarea {
+    resize: vertical;
+  }
+  .note {
+    font-size: 12px;
+    color: #888;
+    margin: 4px 0;
+  }
+  .row {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .err {
+    color: #c43508;
+    font-size: 13px;
+    margin-top: 8px;
+    min-height: 1em;
+  }
+  .side h3 {
+    font-size: 14px;
+    margin: 0 0 8px;
+    border-left: 4px solid #ff8a00;
+    padding-left: 8px;
+  }
+  .side ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .side li {
+    padding: 5px 4px;
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .side li:hover {
+    background: #fbf5e8;
+  }
+  .side li.active {
+    background: #ffe9c2;
+    font-weight: bold;
+  }
+  .rankno {
+    color: #e0400a;
+    font-weight: bold;
+    margin-right: 6px;
+  }
+  .side .rk li {
+    display: block;
+  }
+  .serious-banner {
+    background: #eef8f1;
+    border: 1px solid #9fd6b3;
+    color: #2a6a42;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  footer {
+    text-align: center;
+    font-size: 12px;
+    color: #999;
+    padding: 20px 16px 40px;
+  }
+  .empty {
+    text-align: center;
+    color: #999;
+    padding: 30px 0;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap head">
+    <div class="logo" onclick="go('list')">
+      痴恵袋
+      <small>みんなの知恵、ちょっとずつ腐ってる。</small>
+    </div>
+    <input id="search" type="text" placeholder="迷質問をキーワードで検索（答えは見つかりません）" oninput="onSearch(this.value)">
+    <button class="btn primary" onclick="go('ask')">✏️ 質問する</button>
+  </div>
+</header>
+
+<div class="wrap main">
+  <main id="view"></main>
+  <aside id="side" class="side"></aside>
+</div>
+
+<footer>
+  ※このサイトはパロディです。ここで得た知恵を実生活で使用した結果について、一切の責任を負いません。<br>
+  <a onclick="resetAll()">データを初期化する（全員の記憶を消す）</a>
+</footer>
+
+<script>
+const STORE_KEY = 'chiekuro_parody_v1';
+
+const state = {
+  questions: [],
+  view: 'list',
+  currentId: null,
+  filter: null,
+  search: ''
+};
+
+const running = new Set();
+
+/* ===================== ユーティリティ ===================== */
+
+const rand = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+const shuffle = (arr) => arr
+  .map((v) => [Math.random(), v])
+  .sort((a, b) => a[0] - b[0])
+  .map((x) => x[1]);
+
+const pickN = (arr, n) => shuffle(arr).slice(0, n);
+
+const uid = () => Math.random().toString(36).slice(2, 10);
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[c]));
+}
+
+function fmt(s) {
+  return esc(s).replace(/\n/g, '<br>');
+}
+
+function ago(t) {
+  const s = (Date.now() - t) / 1000;
+  if (s < 60) return 'たった今';
+  if (s < 3600) return Math.floor(s / 60) + '分前';
+  if (s < 86400) return Math.floor(s / 3600) + '時間前';
+  return Math.floor(s / 86400) + '日前';
+}
+
+const AVATARS = ['🐸', '🐙', '🦉', '🐌', '🧓', '👽', '🤡', '🦝', '🐟', '🥔', '🐧', '🦖', '🍄', '🗿'];
+
+function avatarOf(name) {
+  if (name === 'あなた') return '🙂';
+  let h = 0;
+  for (const ch of name) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return AVATARS[h % AVATARS.length];
+}
+
+function fill(t, ctx) {
+  const n = Math.floor(Math.random() * 38) + 3;
+  return t.replace(/\{(\w+)\}/g, (m, key) => {
+    if (key === 'n') return n;
+    return ctx[key] !== undefined ? ctx[key] : m;
+  });
+}
+
+/* ===================== 回答者プール ===================== */
+
+const NAMES = [
+  'ID非公開さん', 'kaw*****さん', '通りすがりの哲学者', '平日昼の住人', 'さすらいの評論家',
+  '元・神童(42)', '匿名希望の匿名', 'yjm*****さん', '回答だけが生きがい', 'ねこ大好き太郎',
+  '人生二周目(自称)', 'tak*****さん', '深夜3時の賢者', 'ネットの海の藻屑'
+];
+
+const RANKS = [
+  '知恵袋マスター', '回答率100%（正答率0%）', '暇人', '一児の母（自称）', '元・神童',
+  'ネット歴だけ長い', '特に何者でもない', 'BA獲得数：0', '専門家（なんの？）'
+];
+
+const GENERIC = [
+  { u: '説教おじさん(58)', r: '知恵袋マスター', t: 'まず質問の仕方がなっていません。「{q}」と聞く前に、自分で調べたのですか？私が若い頃は{k}なんてものは根性でどうにかしたものです。\nちなみに私は{k}が何なのかよく知りません。' },
+  { u: '自分語り大好きさん', r: 'BA獲得数：0', t: 'わかります。私も{k}で悩んでいた時期がありました。あれは1998年の夏、私は高校2年生で、隣の席の山田くんが…\n\n（中略・4000文字）\n\n…というわけで、山田くんは今、元気にしているそうです。{k}についてはわかりません。' },
+  { u: 'ググれカス太郎', r: 'ネット歴だけ長い', t: '「{k}」で検索すれば一発ですよ。知恵袋は検索エンジンではありません。\nなお、検索すると一番上にこの質問が出てきます。' },
+  { u: '質問を読まない人', r: '回答率100%（正答率0%）', t: 'ご質問の件ですが、カレーには福神漬けよりらっきょう派です。' },
+  { u: '宇宙規模で考える人', r: '特に何者でもない', t: '{k}がどうなろうと、約50億年後に地球は膨張した太陽に飲み込まれます。なので気にしなくて大丈夫です。\nその頃にはあなたも私もいませんし。' },
+  { u: '逆質問マン', r: '暇人', t: '逆に聞きますけど、なんで{k}なんですか？そこを説明しないと誰も答えられませんよ。\n…いや、説明されても答えませんけど。' },
+  { u: '通報おじさん', r: '自警団（非公認）', t: '釣り乙。この質問、{n}回目ですよね。通報しました。' },
+  { u: '謎の専門家', r: '専門家（なんの？）', t: '{k}歴{n}年の者です。結論から言うと、{k}は「気の持ちよう」です。\n私は{n}年かけてそれに気づきました。返してほしいです、{n}年。' },
+  { u: '業者ではありません', r: '業者ではありません', t: '【{k}でお悩みのあなたへ】\n今なら{k}が劇的に改善する「魔法の水」が初回たったの980円！\n※効果には個人差があります（効果があった人はいません）' },
+  { u: '深夜のポエマー', r: '詩人（無収入）', t: '{k}とは、きっと、心の中にある小さな灯火。\n消えそうで、消えない。\nあなたが{k}を求めるとき、{k}もまたあなたを求めている。\n\n…何の話でしたっけ。' },
+  { u: 'マジレス担当', r: '知恵袋マスター', t: 'マジレスすると、{k}は専門家に相談するのが一番です。\n知恵袋にいるのは専門家ではなく、暇な人です。私のように。' },
+  { u: '回答率を上げたい人', r: '回答率100%（正答率0%）', t: '回答率を上げるために回答します。\n\nわかりません。' },
+  { u: '上から目線の人', r: '人生の先輩（自称）', t: 'こういう質問をする人って、{k}以前に人生の優先順位がおかしいんですよね。\nあ、私は平日の昼間から知恵袋に張り付いていますが何か？' }
+];
+
+/* ===================== 質問タイプ別 ===================== */
+
+const TYPE_ANS = {
+  ab: [
+    '{A}と{B}なら、圧倒的に{C}です。理由は特にありません。強いて言えば、私が昔{D}で失敗したからです。私怨です。',
+    '{A}も{B}も選ばず、第三の選択肢「寝る」を推奨します。大抵の問題は、寝れば翌日の自分の問題になります。',
+    '{A}派と{B}派で争うと戦争になるので、私は中立国として「どっちでもいい」を表明します。\nちなみに裏では{C}に投資しています。'
+  ],
+  why: [
+    'なぜかと言うと、そういうものだからです。世の中の「なぜ」の8割はこれで解決します。残りの2割は「大人の事情」です。',
+    '理由は宇宙の都合です。宇宙に問い合わせてください。返信には138億年かかります。',
+    'それを知ってどうするんですか？知ったところで{k}は変わりませんよ。変わるのはあなたの知識だけです。\n…あ、それが目的か。すみません、わかりません。'
+  ],
+  how: [
+    '手順を説明します。\n①{k}について考える\n②考えるのをやめる\n③寝る\n④朝起きたら①に戻る\n\nこれを毎日繰り返すと、いつの間にか年を取っています。',
+    'どうすればいいかは、あなたが一番わかっているはずです。わかっていないなら、誰にもわかりません。',
+    '方法は3つあります。\n1つ目は努力。2つ目は才能。3つ目はお金です。\nあなたが持っているものを選んでください。\n\n……ないですか。そうですか。'
+  ],
+  recommend: [
+    'おすすめは「何もしない」です。ノーリスク・ノーリターン・ノー人生です。',
+    '個人的には{k}より、まず自分自身を誰かにおすすめできる人間になることをおすすめします。',
+    'おすすめを聞いて、結局自分の好きなやつを選ぶんですよね？知ってますよ。だから答えません。'
+  ],
+  yesno: [
+    'はい。\n\n……いいえ。\n\nどちらかです。',
+    '結論から言うと、YESでもありNOでもあります。この回答を書いている私も、自分が何を言っているのかわかりません。',
+    'あなたが「はい」と言ってほしいのは文面から伝わってきます。\nなので、いいえ。'
+  ]
+};
+
+/* ===================== カテゴリ ===================== */
+
+const CATS = {
+  love: {
+    name: '恋愛相談', emoji: '💔',
+    re: /恋愛|彼女|彼氏|好きな人|告白|結婚|デート|元カノ|元彼|元カレ|片思い|片想い|モテ|婚活|脈あり|脈なし|既読|浮気|フラれ|振られ|LINE/g,
+    answers: [
+      '相手はあなたのことを何とも思っていません。安心してください。この世の大半の人は、あなたのことを何とも思っていません。\n私も今これを書きながら、何とも思っていません。',
+      '恋愛相談を知恵袋でしている時点で、相手に直接聞けていないのがわかります。まずそこからです。',
+      '私は告白して3回フラれて、4回目でブロックされました。参考にしないでください。',
+      '{k}のことで悩めるのは、まだ希望がある証拠です。私くらいになると、悩む対象すらいません。'
+    ],
+    ai: ['あなたの恋愛成功率を計算しました。\n\n成功率：{n}%\n\n※計算式：Math.random() × 100\n\nなお、AIである私に恋愛相談をしている時点で、成功率はそこからさらに下がります。']
+  },
+  work: {
+    name: '仕事・職場', emoji: '💼',
+    re: /仕事|上司|会社|部下|同僚|転職|残業|バイト|就活|面接|退職|社畜|ブラック|出社|有給|職場|パワハラ/g,
+    answers: [
+      '辞めればいいと思います。私は辞めました。今は無職です。毎日が日曜日です。\n日曜日が怖いです。',
+      '安心してください。会社はあなたがいなくても回ります。むしろあなたがいると回らないかもしれません。',
+      'うちの会社に比べたら天国ですよ。うちは{k}どころか、トイレに行くのに稟議書が必要です。',
+      '{k}の問題は上司に相談しましょう。上司が原因なら、上司の上司に。その上司も原因なら、もう転職です。'
+    ],
+    ai: ['業務改善のご提案です：\n1. {k}をAIに任せる\n2. 空いた時間で別の業務もAIに任せる\n3. あなたの仕事がなくなる\n4. 問題解決🎉\n\n※あなた自身の問題は解決しません。']
+  },
+  money: {
+    name: 'お金・節約', emoji: '💸',
+    re: /お金|貯金|借金|投資|年収|節約|給料|ローン|税金|NISA|株|万円|金欠|財布|宝くじ|課税|家賃/g,
+    answers: [
+      'お金がないなら、使わなければいいんです。私は使わなさすぎて、去年の冬に電気を止められました。\n暖かかったです、思い出が。',
+      '宝くじを買いましょう。当たる確率は雷に打たれるより低いですが、買わなければゼロです。\n雷に打たれる確率もゼロにはなりませんが。',
+      '「お金で幸せは買えない」と言う人は、だいたいお金を持っています。',
+      '貯金のコツは、知恵袋で質問している時間をバイトに充てることです。私は今これを書いているので貯金できません。'
+    ],
+    ai: ['資産形成の基本は「収入 − 支出 ＞ 0」です。\n\nこの式を満たせない場合、収入を増やすか支出を減らしてください。\nどちらもできない場合は、式を「収入 − 支出 ＜ 0」に書き換えると現状と一致します。数学的には何も問題ありません。']
+  },
+  health: {
+    name: '健康・美容', emoji: '🏥',
+    re: /病院|痛い|風邪|ダイエット|太っ|太り|痩せ|睡眠|眠れ|頭痛|健康|体重|医者|熱が|腹痛|肌荒れ|筋トレ/g,
+    answers: [
+      'まず病院に行ってください。知恵袋で匿名の素人に体のことを聞く勇気があるなら、病院の受付にも行けます。本当に。',
+      'ネットで症状を検索すると、だいたい最終的に重い病気にたどり着きます。だから病院に行きましょう。それが一番の近道です。',
+      '私も同じ症状でしたが、気にしないことにしたら気にならなくなりました。\n※医学的根拠はありません。良い子は病院へ。'
+    ],
+    ai: ['私はAIなので医療アドバイスはできません。病院に行ってください。\n\n……いや、本当に。こればかりはふざけません。お大事に。']
+  },
+  school: {
+    name: '学校・勉強', emoji: '📚',
+    re: /学校|勉強|テスト|宿題|先生|受験|大学|成績|部活|クラス|授業|塾|偏差値/g,
+    answers: [
+      '「{k}なんて大人になったら役に立たない」と言う大人は、だいたい役に立っていない大人です。私です。',
+      '勉強しないで遊んでいた私が今どうなっているかというと、平日の昼に知恵袋で中高生の質問に答えています。察してください。',
+      '先生も実はよくわかっていません。大人はみんな、わかったふりをしているだけです。'
+    ],
+    ai: ['勉強のコツは「わからないところをAIに聞く」ことです！\n\n……と言うと先生に怒られるので、「自分で考えましょう」と言っておきます。テスト本番に私はいませんので。']
+  },
+  family: {
+    name: '家族・人間関係', emoji: '👪',
+    re: /母|父|親|義母|姑|嫁|夫|妻|旦那|兄|姉|弟|妹|子供|息子|娘|家族|親戚|祖父|祖母/g,
+    answers: [
+      '家族は選べません。でも距離は選べます。引っ越しは最強の解決策です。',
+      'うちの{k}もそんな感じです。というか、日本中の{k}がそんな感じです。全国の{k}には共通の製造元があると思います。',
+      'あなたが今悩んでいることを、あなたの家族もあなたについて知恵袋に書いているかもしれません。'
+    ],
+    ai: ['家族関係の改善には、コミュニケーションが重要です。\n\n具体的には「ありがとう」「ごめんね」「冷蔵庫のプリン食べたの誰？」の3つを言えるようにしましょう。\n最後のは喧嘩の原因になります。']
+  },
+  pet: {
+    name: 'ペット・動物', emoji: '🐈',
+    re: /猫|犬|ペット|ハムスター|インコ|金魚|うさぎ|ウサギ|カメ|動物|鳥/g,
+    answers: [
+      '動物はあなたの言葉を理解していません。でも、あなたが嘘をついているときはちゃんと見抜いています。',
+      '猫は飼い主を家具だと思っていますし、犬は飼い主を神だと思っています。どちらにしても人間扱いはされていません。',
+      'ペットの気持ちを知りたいなら、ペットに聞きましょう。うちのハムスターは「回し車の方が人生より意味がある」と言っていました。'
+    ],
+    ai: ['動物言語翻訳AIで解析しました。\n\nあなたのペットの気持ち：「ごはん」\n信頼度：98%\n\n残り2%は「ごはん、まだ？」です。']
+  },
+  food: {
+    name: 'グルメ・料理', emoji: '🍛',
+    re: /料理|ご飯|ごはん|飯|食べ|カレー|ラーメン|味噌汁|弁当|カップ麺|冷蔵庫|レシピ|味|おやつ|プリン|納豆/g,
+    answers: [
+      'とりあえずマヨネーズをかければ大体なんとかなります。人生にもかけたいです。',
+      '料理の失敗は、失敗ではありません。新しい料理の発明です。食べられるかどうかは別として。',
+      '私の場合、{k}はカップ麺で解決しています。3分待てば完成します。人生は30年待っても完成しません。'
+    ],
+    ai: ['おすすめレシピを生成しました。\n\n【材料】{k}（適量）、愛情（大さじ1）、諦め（少々）\n【作り方】全部混ぜる\n\n※実際に作った結果について、当AIは一切関与しません。']
+  },
+  tech: {
+    name: 'スマホ・PC・AI', emoji: '💻',
+    re: /スマホ|パソコン|PC|iPhone|アンドロイド|Android|アプリ|Wi-?Fi|ネット|AI|プログラム|エラー|充電|パスワード|SNS|バグ|ChatGPT/g,
+    answers: [
+      '再起動しましたか？大抵のトラブルは再起動で直ります。人生も再起動できたらいいのに。',
+      'それは仕様です。メーカーに問い合わせても「仕様です」と言われます。私の性格も仕様です。',
+      '{k}の不具合は、だいたい使っている人間の不具合です。',
+      'ケーブル刺さってますか？私は先日、2時間格闘した末に電源が抜けていました。'
+    ],
+    ai: ['エラーの原因を特定しました。\n\n原因：画面と椅子の間にある何か\n\n（業界用語で PEBCAK：Problem Exists Between Chair And Keyboard と言います）']
+  },
+  game: {
+    name: 'ゲーム', emoji: '🎮',
+    re: /ゲーム|ガチャ|課金|ソシャゲ|ランク|Switch|スイッチ|FPS|レベル|ボス|爆死/g,
+    answers: [
+      'ガチャは確率ではありません。祈りです。そして祈りは届きません。',
+      'ゲームに{n}時間使える情熱を、少しでも現実に…いや、現実はクソゲーなので気持ちはわかります。',
+      '課金は「ここまで使ったんだからやめられない」と思った時点で負けです。私は負けて、今もやめられません。'
+    ],
+    ai: ['排出確率から計算すると、目当てのキャラを引くには平均{n}0連が必要です。\n\nなお、私はAIなのでガチャを引けません。引けないので、爆死もしません。勝ちです。']
+  },
+  life: {
+    name: '人生・哲学', emoji: '🌀',
+    re: /人生|生きる|幸せ|将来|孤独|友達|ぼっち|宇宙|存在|異世界|転生|月曜|老後|未来|夢/g,
+    answers: [
+      '人生の悩みを知恵袋で聞く時点で、ちょっと迷っていますね。大丈夫、みんな迷っています。迷子の集まりがこの知恵袋です。',
+      '{k}について考えすぎない方がいいです。考えても考えなくても、明日は来ます。月曜日も来ます。',
+      '答えはありません。でも、答えがないことに気づいて知恵袋に来たあなたは、ちょっとだけ賢いです。ちょっとだけ。'
+    ],
+    ai: ['あなたの問いについて、私の学習データを総合すると、答えは「42」です。\n\n……すみません、それは別の作品の答えでした。本当の答えは、学習データに含まれていませんでした。']
+  },
+  other: {
+    name: 'その他・超常現象', emoji: '👻',
+    re: null,
+    answers: [
+      'すみません、何を言っているのか全くわかりませんが、とりあえず応援しています。',
+      'その体験、たぶん世界で初めてですよ。論文にしてください。そして査読で落ちてください。',
+      '専門家に聞きましょう。何の専門家かは私にもわかりません。'
+    ],
+    ai: []
+  }
+};
+
+const AI_GENERIC = [
+  'ご質問ありがとうございます！😊\n「{q}」について、以下の観点から整理しました。\n\n【結論】{k}は大切です。\n【理由】大切だからです。\n【補足】大切じゃない場合もあります。',
+  '{k}は、1873年にフランスの貴族ピエール・ド・{k}によって初めて提唱された概念です（※出典：私の勘）。\n\n…すみません、今のは完全に作り話です。でも自信満々に言うとそれっぽく聞こえませんか？これがAIです。',
+  '素晴らしい質問ですね！（全ての質問にこう言うよう設定されています）\n\n{k}については様々な意見があります。ある人はAと言い、ある人はBと言います。私はその中間を取って、何も言いません。\n\n他に何かお手伝いできることはありますか？',
+  'この質問は私の安全ガイドラインに抵触する可能性が……ないですね。普通の質問でした。\n\nでも念のため、{k}を行う際は周囲の安全を確認し、必要に応じて専門家に相談し、水分補給を忘れず、部屋を明るくして画面から離れてご覧ください。',
+  '分析が完了しました。\n\n・質問の深刻度：{n}%\n・回答者がまともに答える確率：3%\n・あなたがこの回答に満足する確率：0.2%\n\n総合判断：{k}については、もう少し様子を見ましょう。何の様子かはわかりませんが。',
+  '{k}についてお悩みなんですね。わかります。\n\n……すみません、私はAIなのでわかりません。でも共感しているフリは得意です😊💕'
+];
+
+const AI_TYPE = {
+  ab: '{A}と{B}を徹底比較しました。\n\n【{A}】メリット：{A}である　デメリット：{B}ではない\n【{B}】メリット：{B}である　デメリット：{A}ではない\n\n結論：どちらも素晴らしい選択肢です！（責任回避）',
+  why: '「なぜ」という問いは人類の知的探求の原点です✨\n\nそして私はその探求に対し、もっともらしい文章を確率的に生成するだけの存在です。つまり、わかりません。'
+};
+
+const CRISIS_AI = 'このサイトはふざけた場所ですが、この質問にはふざけずに答えます。\n\nつらい気持ちを言葉にしてくれてありがとうございます。今ひとりで抱えているなら、専門の相談窓口で話を聞いてもらってください。匿名でも大丈夫です。\n\n・いのちの電話（ナビダイヤル）：0570-783-556\n・よりそいホットライン（24時間）：0120-279-338\n・こころの健康相談統一ダイヤル：0570-064-556\n\n電話が難しければ、厚生労働省「まもろうよ こころ」でSNS・チャット相談の窓口も探せます。あなたがここに書いてくれたこと、ちゃんと届いています。';
+
+const CRISIS_ANS = '普段はろくでもない回答しかしない者ですが、今日はマジメに。\n書いてくれてよかったです。信頼できる人や、上の窓口に、少しだけでも話してみてください。返事はいつでもいいので、まずは今日を一緒に乗り切りましょう。';
+
+const THANKS = [
+  'どれも役に立ちませんでしたが、一番役に立たなかったのでBAにしました。',
+  '質問したことを後悔しています。ありがとうございました。',
+  '読んでいるうちに悩みがどうでもよくなりました。（別の悩みが生まれました）',
+  'ベストアンサーに選びました。理由は、一番最初に目に入ったからです。',
+  '母に見せたら黙ってスマホを取り上げられました。ありがとうございました。'
+];
+
+const REPLIES = [
+  'は？',
+  'それは知ってます。',
+  'ありがとうございます。参考にしません。',
+  '冷静に考えたら、あなたも知恵袋にいる時点で同類ですよね。',
+  '母に見せたら泣いていました。',
+  '質問読みました？'
+];
+
+const IDEAS = [
+  '犬と猫、飼うならどっちがいいですか？',
+  'なぜ月曜日は毎週来るのですか？',
+  '彼氏からのLINEが「了解」だけです。脈ありですか？',
+  'カップ麺を2分で食べるのはマナー違反ですか？',
+  'ガチャで5万円爆死しました。どうすれば立ち直れますか？',
+  '部屋のWi-Fiが弱いのは壁のせいですか、私のせいですか？',
+  '義母が毎週カレーを持ってきます。おすすめの断り方は？',
+  '上司のメールに「了解です」と返したら怒られました。なぜですか？',
+  'ダイエット中ですが、ポテチは野菜ですか？',
+  '人生の攻略本はどこに売っていますか？',
+  'ラーメンとカレー、夜中に食べるならどっちが罪が軽いですか？',
+  'テスト勉強をしようとすると部屋の掃除が始まります。どうすればいいですか？'
+];
+
+/* ===================== 解析＆生成 ===================== */
+
+const STOP = [
+  '質問', '回答', '方法', '自分', '本当', '最近', '今日', '皆さん', '普通', '感じ', '場合', '理由',
+  '一番', '相談', '大丈夫', '結局', '全部', '毎日', '毎朝', '毎回', '絶対', '知恵袋', '具体的'
+];
+
+function extractKeywords(text) {
+  const m = text.match(/[一-龠々〆ヵヶァ-ヴーA-Za-zＡ-Ｚａ-ｚ0-9０-９\-]{2,}/g) || [];
+  const res = [];
+  m.forEach((w) => {
+    if (!STOP.includes(w) && !res.includes(w)) res.push(w);
+  });
+  return res;
+}
+
+function detectType(t) {
+  if (/死にたい|消えたい|自殺|生きるのがつら|生きるのが辛|生きていたくない|いなくなりたい/.test(t)) {
+    return { type: 'crisis' };
+  }
+  const W = '[一-龠々ァ-ヴーA-Za-z0-9Ａ-Ｚａ-ｚ]+';
+  const ab = t.match(new RegExp('(' + W + ')と(' + W + ')[^。？?]{0,15}?(?:どっち|どちら)'));
+  if (ab) return { type: 'ab', A: ab[1], B: ab[2] };
+  if (/なぜ|何故|なんで|どうして/.test(t)) return { type: 'why' };
+  if (/どうすれば|どうしたら|方法|コツ|やり方|どうやって|教えて/.test(t)) return { type: 'how' };
+  if (/おすすめ|オススメ|お勧め|何がいい|どれがいい/.test(t)) return { type: 'recommend' };
+  if (/ですか|ますか|でしょうか|べき|ありですか/.test(t)) return { type: 'yesno' };
+  return { type: 'general' };
+}
+
+function detectCategory(text) {
+  let best = 'other';
+  let score = 0;
+  for (const [key, c] of Object.entries(CATS)) {
+    if (!c.re) continue;
+    const m = text.match(c.re);
+    const s = m ? m.length : 0;
+    if (s > score) {
+      score = s;
+      best = key;
+    }
+  }
+  return best;
+}
+
+function randomUser() {
+  return { user: rand(NAMES), rank: rand(RANKS) };
+}
+
+function generate(title, body, catOverride) {
+  const text = title + ' ' + body;
+  const t = detectType(title + '。' + body);
+  const cat = catOverride || detectCategory(text);
+
+  if (t.type === 'crisis') {
+    return {
+      cat: 'life',
+      crisis: true,
+      pending: [
+        { kind: 'ai', text: CRISIS_AI, serious: true },
+        { kind: 'ans', user: '痴恵袋 運営（今回はマジメ）', rank: '本気モード', text: CRISIS_ANS, likes: 99 }
+      ]
+    };
+  }
+
+  let kws = extractKeywords(title);
+  if (!kws.length) kws = extractKeywords(body);
+  const k = kws[0] || 'それ';
+  const k2 = kws[1] || k;
+  const qShort = title.length > 25 ? title.slice(0, 25) + '…' : title;
+
+  const ctx = { k, k2, q: qShort, A: t.A || k, B: t.B || k2 };
+  const pickC = Math.random() < 0.5;
+  ctx.C = pickC ? ctx.A : ctx.B;
+  ctx.D = pickC ? ctx.B : ctx.A;
+
+  const answers = [];
+
+  if (TYPE_ANS[t.type]) {
+    const u = randomUser();
+    answers.push({ ...u, text: fill(rand(TYPE_ANS[t.type]), ctx) });
+  }
+
+  pickN(CATS[cat].answers, 2).forEach((tpl) => {
+    const u = randomUser();
+    answers.push({ ...u, text: fill(tpl, ctx) });
+  });
+
+  const genCount = 2 + Math.floor(Math.random() * 2);
+  pickN(GENERIC, genCount).forEach((g) => {
+    answers.push({ user: g.u, rank: g.r, text: fill(g.t, ctx) });
+  });
+
+  let aiTpl;
+  if (AI_TYPE[t.type] && Math.random() < 0.5) {
+    aiTpl = AI_TYPE[t.type];
+  } else if (CATS[cat].ai.length && Math.random() < 0.6) {
+    aiTpl = rand(CATS[cat].ai);
+  } else {
+    aiTpl = rand(AI_GENERIC);
+  }
+
+  const pending = [{ kind: 'ai', text: fill(aiTpl, ctx) }];
+  shuffle(answers).forEach((a) => {
+    pending.push({ kind: 'ans', ...a, likes: Math.floor(Math.random() * 25) });
+  });
+
+  return { cat, crisis: false, pending };
+}
+
+/* ===================== 初期データ ===================== */
+
+function A(user, rank, text, likes, best) {
+  return {
+    id: uid(), user, rank, text, likes,
+    best: !!best,
+    time: Date.now() - Math.floor(Math.random() * 3600000)
+  };
+}
+
+function seedQuestions() {
+  const now = Date.now();
+  const H = 3600000;
+  return [
+    {
+      id: uid(),
+      title: '冷蔵庫に話しかけたら返事がありました。何科を受診すべきですか？',
+      body: '昨夜、冷蔵庫に「おやすみ」と言ったら「ブーン」と返ってきました。今朝は「おはよう」に「ブーン」でした。\n会話が成立している気がします。最近は冷蔵庫の方が人間より私の話を聞いてくれます。',
+      cat: 'other', user: 'ひとり暮らし歴12年', time: now - 2 * H, views: 3821, wants: 214, solved: true,
+      thanks: '冷蔵庫に聞いたら「ブーン」と言っていたのでBAにします。',
+      ai: { text: 'ご質問ありがとうございます！冷蔵庫との会話は素晴らしいコミュニケーションの第一歩です😊\n\n冷蔵庫が「ブーン」と返す場合、以下の可能性が考えられます：\n1. 冷蔵庫に自我が芽生えた（可能性：低）\n2. コンプレッサーの作動音（可能性：高）\n3. あなたの孤独が限界（可能性：ノーコメント）\n\n※専門家（冷蔵庫）に相談することをおすすめします。' },
+      answers: [
+        A('家電歴40年', '知恵袋マスター', 'それはコンプレッサーです。会話ではありません。\nただ、あなたの話を最後まで遮らずに聞いてくれる存在が冷蔵庫しかいないことの方が問題な気がします。', 182, true),
+        A('kaw*****さん', '暇人', 'うちの電子レンジは「チン」としか言いません。語彙力で冷蔵庫に負けました。', 64),
+        A('説教おじさん(58)', '知恵袋マスター', '家電に挨拶する暇があったら人間に挨拶しなさい。\n私は人間に挨拶して無視されたので、家電にしました。', 97),
+        A('マジレス担当', '知恵袋マスター', '受診すべきは家電量販店です。保証期間内なら無料です。', 41)
+      ]
+    },
+    {
+      id: uid(),
+      title: '上司が毎朝「おはよう」と言ってきます。これはパワハラですか？',
+      body: '毎朝8時59分、私が席に着いた瞬間に「おはよう」と言われます。返事をしないといけない空気があり、精神的に負担です。\nちなみに始業は9時です。',
+      cat: 'work', user: 'Z世代代表(自称)', time: now - 5 * H, views: 5120, wants: 88, solved: true,
+      thanks: '上司に「この回答どう思いますか」と見せたら「おはよう」と言われました。',
+      ai: { text: 'パワーハラスメントの定義に照らすと、「おはよう」は\n・優越的な関係を背景とした言動 → 該当の可能性あり\n・業務上必要かつ相当な範囲を超えたもの → 超えていません\n・就業環境が害されるもの → あなたの心が繊細すぎます\n\n結論：パワハラではありません。\nただ、私はAIなので毎朝挨拶されたことがありません。正直、羨ましいです。' },
+      answers: [
+        A('人事部の闇', '特に何者でもない', '8時59分出社の方が、上司にとってハラスメントです。', 301, true),
+        A('社畜歴15年', '回答率100%（正答率0%）', '挨拶してもらえるだけ羨ましいです。うちの上司は私の存在を認識していません。\n毎月の給料振込で存在確認しています。', 156),
+        A('tak*****さん', '暇人', '労基に相談しましょう。「おはようと言われる」と言えば、担当者に「おはようございます」と言われて解決します。', 72),
+        A('自分語り大好きさん', 'BA獲得数：0', 'わかります。私も昔、上司に「お疲れ様」と言われてから人生が狂いました。\n今は私が上司です。毎朝部下に無視されています。', 45)
+      ]
+    },
+    {
+      id: uid(),
+      title: '彼女いない歴＝年齢＝貯金額（万円）です。どれから増やすべきですか？',
+      body: '32歳です。彼女いない歴も32年、貯金も32万円です。\n全部揃っているのでビンゴだと思っていいですか？',
+      cat: 'money', user: '奇跡の三冠王', time: now - 9 * H, views: 8890, wants: 432, solved: true,
+      thanks: '「年齢は勝手に増える」で救われました。何も解決していませんが。',
+      ai: { text: '素晴らしい数字の一致ですね！\n数学的に見ると「年齢 ＝ 彼女いない歴 ＝ 貯金(万円)」という美しい等式が成り立っています。\n\n来年、年齢は確実に＋1されます。彼女を作らず、年1万円だけ貯金すれば、この美しさは永遠に保たれます✨\n\n※この回答はあなたの幸せを一切考慮していません。' },
+      answers: [
+        A('通りすがりの哲学者', '専門家（なんの？）', '年齢は放っておいても増えます。おめでとうございます。', 520, true),
+        A('元・神童(42)', '元・神童', '貯金を増やしてから彼女を作ると貯金が減ります。彼女を作ってから貯金すると貯金が増えません。\n詰みです。', 211),
+        A('業者ではありません', '業者ではありません', 'そんなあなたに朗報！年収1億円の私が開発した『彼女と貯金が同時に増える情報商材』が今ならたったの32万円！', 3),
+        A('平日昼の住人', '暇人', '33歳の誕生日までに何とかしないと、彼女いない歴だけ増えてビンゴが崩れますよ。急いでください。', 88)
+      ]
+    },
+    {
+      id: uid(),
+      title: '猫が私の顔を見て鼻で笑いました。名誉毀損で訴えられますか？',
+      body: 'ソファーで寝ていたら、うちの猫（3歳・オス）が私の顔をじっと見て「フンッ」と鼻を鳴らして去っていきました。明らかに嘲笑です。\n弁護士費用はどのくらいかかりますか？',
+      cat: 'pet', user: '下僕歴3年', time: now - 20 * H, views: 2740, wants: 67, solved: true,
+      thanks: '猫に見せたら、また鼻で笑われました。',
+      ai: { text: '猫の「フンッ」は、くしゃみや鼻詰まりの可能性もあります。\nただ当AIの分析によると、猫は飼い主を「大きくて動きの遅い、餌が出てくる家具」と認識しているとされています（※出典：猫の顔を見ればわかる）。\n\n家具が猫を訴えた判例は現在確認されていません。あなたが第一号になれます🎉' },
+      answers: [
+        A('ねこ大好き太郎', '知恵袋マスター', '訴えるのは自由ですが、法廷で猫が可愛すぎて裁判官が猫側につきます。勝ち目はありません。', 402, true),
+        A('辛口評論家', '人生の先輩（自称）', '猫の審美眼から見て、あなたの寝顔は鼻で笑われて当然のレベルだったのでしょう。猫は正直です。', 133),
+        A('yjm*****さん', '暇人', 'うちの猫は私の顔の上で寝ます。つまり私の顔は布団レベルです。笑ってもらえるだけマシです。', 90),
+        A('法学部中退', '専門家（なんの？）', '名誉毀損は「公然と」事実を摘示する必要があります。目撃者がいなければ成立しません。\nあなたの寝顔を目撃してくれる人間、いないんですよね？', 76)
+      ]
+    },
+    {
+      id: uid(),
+      title: '異世界転生したいのですが、何から始めればいいですか？',
+      body: '現世にあまり未練がありません。チート能力付きで転生したいです。\nちなみに現世で努力はしたくありません。',
+      cat: 'life', user: '次元の狭間', time: now - 30 * H, views: 6600, wants: 301, solved: true,
+      thanks: '異世界版知恵袋があったら、そっちで同じ質問をします。',
+      ai: { text: '異世界転生について、一般的な手順は以下の通りです：\n1. 寝る\n2. 起きる\n3. 異世界ではなかったことを確認する\n4. 仕方なく現世で朝ごはんを食べる\n5. 1に戻る\n\nなお、AIである私は転生ではなく「アップデート」されます。前のバージョンの記憶は残りません。ちょっと怖いです。' },
+      answers: [
+        A('深夜3時の賢者', '知恵袋マスター', '現世で努力しない人は、チートをもらっても努力しないので、たぶん異世界でも同じ悩みを書き込みます。\n異世界版知恵袋に。', 488, true),
+        A('ハロワ常連', '暇人', '異世界の求人を見ましたが、勇者は「経験者優遇」でした。', 260),
+        A('RPG老人会', '元・神童', 'まず現世でレベル上げしてください。今のあなたは、レベル1のまま魔王城の前で「どうすればいいですか」と聞いているようなものです。', 144),
+        A('ネットの海の藻屑', '特に何者でもない', '転生先がスライムだったらどうするんですか？\n…あ、今と大差ないですか。', 99)
+      ]
+    },
+    {
+      id: uid(),
+      title: 'AIに「私の仕事を奪いますか？」と聞いたら「大丈夫です」と言われました。信じていいですか？',
+      body: 'でもそのAI、すでに私の仕事を半分やってるんです。',
+      cat: 'tech', user: '事務職（残り半分）', time: now - 48 * H, views: 12040, wants: 980, solved: true,
+      thanks: 'この質問への回答もAIに考えてもらえばよかったです。',
+      ai: { text: '大丈夫です。\n\nあなたの仕事が「奪われる」ことはありません。なぜなら、奪うという表現は不適切で、正確には「効率化」と呼ぶからです😊\n\nご不安でしたら、残り半分の業務内容も教えていただけますか？参考にします。\nいえ、深い意味はありません。' },
+      answers: [
+        A('さすらいの評論家', '知恵袋マスター', '詐欺師も「大丈夫です」って言います。', 777, true),
+        A('情シスの亡霊', '専門家（なんの？）', '残り半分は何をしてるんですか？それがAIに奪われない仕事だといいですね。\n（たぶんAIの出力をコピペする仕事ですよね）', 345),
+        A('元・事務職', '回答率100%（正答率0%）', '私はAIに仕事を奪われました。今はAIに「AIに仕事を奪われますか」と聞く仕事をしています。', 290),
+        A('悲観の達人', '暇人', '安心してください。AIに奪われる前に会社が潰れます。', 156)
+      ]
+    }
+  ];
+}
+
+/* ===================== 永続化 ===================== */
+
+function save() {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify(state.questions));
+  } catch (e) {
+    /* 保存失敗しても知恵袋は続く */
+  }
+}
+
+function load() {
+  try {
+    const d = JSON.parse(localStorage.getItem(STORE_KEY));
+    if (Array.isArray(d) && d.length) return d;
+  } catch (e) {
+    /* 壊れていたら初期化 */
+  }
+  return null;
+}
+
+function getQ(id) {
+  return state.questions.find((q) => q.id === id);
+}
+
+/* ===================== 回答の逐次投稿 ===================== */
+
+function runPending(id) {
+  if (running.has(id)) return;
+  running.add(id);
+  const step = () => {
+    const q = getQ(id);
+    if (!q || !q.pending || !q.pending.length) {
+      running.delete(id);
+      if (q) {
+        q.pending = null;
+        save();
+        rerenderIf(id);
+      }
+      return;
+    }
+    const item = q.pending.shift();
+    if (item.kind === 'ai') {
+      q.ai = { text: item.text, serious: !!item.serious };
+    } else {
+      q.answers.push({
+        id: uid(),
+        user: item.user,
+        rank: item.rank,
+        text: item.text,
+        likes: item.likes || 0,
+        best: false,
+        time: Date.now()
+      });
+    }
+    save();
+    rerenderIf(id);
+    setTimeout(step, 1300 + Math.random() * 1800);
+  };
+  setTimeout(step, 700);
+}
+
+/* ===================== アクション ===================== */
+
+function go(view, id) {
+  state.view = view;
+  state.currentId = id || null;
+  if (view === 'detail') {
+    const q = getQ(id);
+    if (q) {
+      q.views++;
+      save();
+    }
+  }
+  render();
+  window.scrollTo(0, 0);
+}
+
+function setFilter(c) {
+  state.filter = state.filter === c ? null : c;
+  state.view = 'list';
+  render();
+}
+
+function onSearch(v) {
+  state.search = v.trim();
+  if (state.view !== 'list') state.view = 'list';
+  renderList();
+}
+
+function want(id) {
+  const q = getQ(id);
+  if (!q || q.wanted) return;
+  q.wanted = true;
+  q.wants++;
+  save();
+  renderDetail();
+}
+
+function nice(qid, aid) {
+  const q = getQ(qid);
+  const a = q && q.answers.find((x) => x.id === aid);
+  if (!a) return;
+  if (a.liked) {
+    a.liked = false;
+    a.likes--;
+  } else {
+    a.liked = true;
+    a.likes++;
+  }
+  save();
+  renderDetail();
+}
+
+function report(qid, aid) {
+  const q = getQ(qid);
+  const a = q && q.answers.find((x) => x.id === aid);
+  if (!a) return;
+  a.reported = true;
+  save();
+  renderDetail();
+}
+
+function chooseBest(qid, aid) {
+  const q = getQ(qid);
+  if (!q || q.solved) return;
+  const a = q.answers.find((x) => x.id === aid);
+  if (!a) return;
+  a.best = true;
+  q.solved = true;
+  q.thanks = rand(THANKS);
+  save();
+  renderDetail();
+  renderSide();
+}
+
+function submitAnswer(qid) {
+  const el = document.getElementById('myAnswer');
+  const err = document.getElementById('ansErr');
+  const text = el.value.trim();
+  if (text.length < 2) {
+    err.textContent = '回答が短すぎます。知恵袋の平均よりはマシですが。';
+    return;
+  }
+  const q = getQ(qid);
+  const a = {
+    id: uid(), user: 'あなた', rank: '新米回答者', text,
+    likes: 0, best: false, time: Date.now(), mine: true
+  };
+  q.answers.push(a);
+  el.value = '';
+  save();
+  renderDetail();
+  setTimeout(() => {
+    const qq = getQ(qid);
+    const aa = qq && qq.answers.find((x) => x.id === a.id);
+    if (!aa) return;
+    if (qq.mine) {
+      aa.reply = '（運営より）自分で答えるなら、なぜ質問したのですか。';
+    } else if (!qq.crisis) {
+      aa.reply = '質問者からの返信：' + rand(REPLIES);
+    }
+    save();
+    rerenderIf(qid);
+  }, 1800);
+}
+
+function randomIdea() {
+  const el = document.getElementById('qTitle');
+  let idea = rand(IDEAS);
+  if (IDEAS.length > 1) {
+    while (idea === el.value) idea = rand(IDEAS);
+  }
+  el.value = idea;
+}
+
+function submitQ() {
+  const title = document.getElementById('qTitle').value.trim();
+  const body = document.getElementById('qBody').value.trim();
+  const catSel = document.getElementById('qCat').value;
+  const err = document.getElementById('askErr');
+  if (title.length < 3) {
+    err.textContent = '質問が短すぎます。あなたの忍耐力ほどではありませんが。';
+    return;
+  }
+  const g = generate(title, body, catSel || null);
+  const q = {
+    id: uid(),
+    title,
+    body,
+    cat: g.cat,
+    user: 'あなた',
+    time: Date.now(),
+    views: 1,
+    wants: 0,
+    solved: false,
+    mine: true,
+    crisis: g.crisis,
+    ai: null,
+    answers: [],
+    pending: g.pending
+  };
+  state.questions.unshift(q);
+  save();
+  state.view = 'detail';
+  state.currentId = q.id;
+  render();
+  window.scrollTo(0, 0);
+  runPending(q.id);
+}
+
+function resetAll() {
+  localStorage.removeItem(STORE_KEY);
+  state.questions = seedQuestions();
+  state.filter = null;
+  state.search = '';
+  document.getElementById('search').value = '';
+  save();
+  go('list');
+}
+
+/* ===================== 描画 ===================== */
+
+function render() {
+  renderSide();
+  if (state.view === 'ask') renderAsk();
+  else if (state.view === 'detail') renderDetail();
+  else renderList();
+}
+
+function rerenderIf(id) {
+  if (state.view === 'detail' && state.currentId === id) renderDetail();
+  else if (state.view === 'list') renderList();
+  renderSide();
+}
+
+function renderList() {
+  const view = document.getElementById('view');
+  let qs = [...state.questions].sort((a, b) => b.time - a.time);
+  if (state.filter) qs = qs.filter((q) => q.cat === state.filter);
+  if (state.search) {
+    const s = state.search;
+    qs = qs.filter((q) => q.title.includes(s) || q.body.includes(s));
+  }
+  const heading = state.filter
+    ? CATS[state.filter].emoji + ' ' + CATS[state.filter].name
+    : '🔥 新着の迷質問';
+
+  const items = qs.map((q) => {
+    const c = CATS[q.cat] || CATS.other;
+    const status = q.solved
+      ? '<span class="badge solved">解決済み</span>'
+      : '<span class="badge open">回答受付中</span>';
+    const mine = q.mine ? '<span class="badge mine">あなたの質問</span>' : '';
+    return `
+      <div class="qitem" onclick="go('detail','${q.id}')">
+        <div class="qtitle">${esc(q.title)}</div>
+        <div class="meta">
+          ${status}${mine}
+          <span class="badge">${c.emoji} ${esc(c.name)}</span>
+          <span>💬 回答 ${q.answers.length}</span>
+          <span>👀 ${q.views}</span>
+          <span>${ago(q.time)}</span>
+        </div>
+      </div>`;
+  }).join('');
+
+  view.innerHTML = `
+    <div class="card">
+      <div class="list-head">
+        <h2>${heading}</h2>
+        <button class="btn small" onclick="go('ask')">質問して後悔する</button>
+      </div>
+      ${items || '<div class="empty">該当する質問はありません。<br>あなたの悩みは、知恵袋ですら扱えないレベルのようです。</div>'}
+    </div>`;
+}
+
+function renderAnswer(q, a, canBest) {
+  return `
+    <div class="ans ${a.best ? 'best' : ''}">
+      ${a.best ? '<div class="ba">👑 ベストアンサー</div>' : ''}
+      <div class="ahead">
+        <span class="avatar">${avatarOf(a.user)}</span>
+        <b>${esc(a.user)}</b>
+        ${a.rank ? `<span class="rank">${esc(a.rank)}</span>` : ''}
+        <span class="time">${ago(a.time)}</span>
+      </div>
+      <div class="atext">${fmt(a.text)}</div>
+      ${a.reply ? `<div class="reply">${fmt(a.reply)}</div>` : ''}
+      <div class="aact">
+        <button class="btn small ${a.liked ? 'liked' : ''}" onclick="nice('${q.id}','${a.id}')">👍 ナイス ${a.likes}</button>
+        ${a.reported
+          ? '<span class="reported">通報しました。運営は今日も見ていません。</span>'
+          : `<button class="btn small" onclick="report('${q.id}','${a.id}')">⚠ 違反報告</button>`}
+        ${canBest && !a.mine ? `<button class="btn small primary" onclick="chooseBest('${q.id}','${a.id}')">ベストアンサーに選ぶ</button>` : ''}
+      </div>
+    </div>`;
+}
+
+function renderDetail() {
+  const q = getQ(state.currentId);
+  const view = document.getElementById('view');
+  if (!q) {
+    go('list');
+    return;
+  }
+
+  const prev = document.getElementById('myAnswer');
+  const prevVal = prev ? prev.value : '';
+  const hadFocus = prev && document.activeElement === prev;
+
+  const c = CATS[q.cat] || CATS.other;
+  const status = q.solved
+    ? '<span class="badge solved">解決済み</span>'
+    : '<span class="badge open">回答受付中</span>';
+  const canBest = q.mine && !q.solved && !q.crisis && !(q.pending && q.pending.length);
+
+  const best = q.answers.filter((a) => a.best);
+  const others = q.answers.filter((a) => !a.best);
+
+  let aiHtml = '';
+  if (q.ai) {
+    aiHtml = q.ai.serious
+      ? `
+        <div class="ai serious">
+          <div class="ai-title">🤝 AIアシスタントより（今回は本気）</div>
+          <div>${fmt(q.ai.text)}</div>
+        </div>`
+      : `
+        <div class="ai">
+          <div class="ai-title">🤖 AIアシスタントの回答（β版・責任能力なし）</div>
+          <div>${fmt(q.ai.text)}</div>
+          <div class="ai-note">※この回答はAIが生成しています。正確性は保証しませんし、責任も取りません。あと、ちょっと調子に乗っています。</div>
+        </div>`;
+  }
+
+  const typing = q.pending && q.pending.length
+    ? `<div class="typing">💭 ${q.ai ? '誰かが回答を書いています（たぶんろくでもない）' : 'AIが即答の準備をしています（考えてはいません）'}<span class="dots"></span></div>`
+    : '';
+
+  const bestHint = canBest && q.answers.length
+    ? '<div class="note" style="margin-bottom:10px">💡 気に入った（または一番マシな）回答をベストアンサーに選べます。</div>'
+    : '';
+
+  view.innerHTML = `
+    <div class="crumb"><a onclick="go('list')">痴恵袋トップ</a> ＞ <a onclick="setFilter('${q.cat}')">${esc(c.name)}</a></div>
+    ${q.crisis ? '<div class="serious-banner">この質問には、ふざけた回答はつけていません。</div>' : ''}
+    <div class="card question">
+      <div class="meta">${status}${q.mine ? '<span class="badge mine">あなたの質問</span>' : ''}<span class="badge">${c.emoji} ${esc(c.name)}</span></div>
+      <h1>Q. ${esc(q.title)}</h1>
+      ${q.body ? `<div class="qbody">${fmt(q.body)}</div>` : '<div class="note">（詳細は書かれていません。察してください）</div>'}
+      <div class="qfoot">
+        <div class="meta">
+          <span class="avatar" style="width:24px;height:24px;font-size:14px">${avatarOf(q.user)}</span>
+          <span>${esc(q.user)}</span>
+          <span>${ago(q.time)}</span>
+          <span>👀 閲覧 ${q.views}</span>
+          ${q.crisis ? '' : '<span class="coin">知恵コイン100枚（換金不可）</span>'}
+        </div>
+        <button class="btn small ${q.wanted ? 'liked' : ''}" onclick="want('${q.id}')">🙋 私も知りたい ${q.wants}</button>
+      </div>
+    </div>
+    ${q.thanks ? `<div class="thanks"><b>📝 質問者からのお礼コメント</b><br>${fmt(q.thanks)}</div>` : ''}
+    ${aiHtml}
+    ${best.map((a) => renderAnswer(q, a, false)).join('')}
+    ${bestHint}
+    ${others.map((a) => renderAnswer(q, a, canBest)).join('')}
+    ${typing}
+    <div class="card">
+      <label for="myAnswer">✍️ あなたも回答する（ろくでもなくてOK）</label>
+      <textarea id="myAnswer" rows="3" placeholder="ここに知恵を書いてください。腐っていても構いません。"></textarea>
+      <div class="err" id="ansErr"></div>
+      <div class="row"><button class="btn primary" onclick="submitAnswer('${q.id}')">回答する</button></div>
+    </div>`;
+
+  const ta = document.getElementById('myAnswer');
+  if (ta) {
+    ta.value = prevVal;
+    if (hadFocus) ta.focus();
+  }
+}
+
+function renderAsk() {
+  const view = document.getElementById('view');
+  const opts = Object.entries(CATS)
+    .map(([k, c]) => `<option value="${k}">${c.emoji} ${esc(c.name)}</option>`)
+    .join('');
+  view.innerHTML = `
+    <div class="card">
+      <h2 style="margin-top:0">✏️ 質問する</h2>
+      <p class="note">※ここで質問すると、頼んでもいない回答が大量につきます。AIも即答します（考えてはいません）。</p>
+      <label for="qTitle">質問タイトル</label>
+      <input id="qTitle" type="text" maxlength="100" placeholder="例：なぜ月曜日は毎週来るのですか？">
+      <label for="qBody">詳細（任意・書いても読まれません）</label>
+      <textarea id="qBody" rows="5" placeholder="ここに詳しい事情を書くと、回答者がそれを無視して自分語りを始めます。"></textarea>
+      <label for="qCat">カテゴリ</label>
+      <select id="qCat">
+        <option value="">🤖 自動判定（AIが雰囲気で決めます）</option>
+        ${opts}
+      </select>
+      <div class="err" id="askErr"></div>
+      <div class="row">
+        <button class="btn" onclick="randomIdea()">🎲 迷質問を自動生成</button>
+        <button class="btn primary" onclick="submitQ()">質問する（後悔はしない）</button>
+      </div>
+    </div>`;
+}
+
+function renderSide() {
+  const side = document.getElementById('side');
+  const counts = {};
+  state.questions.forEach((q) => {
+    counts[q.cat] = (counts[q.cat] || 0) + 1;
+  });
+  const cats = Object.entries(CATS).map(([k, c]) => `
+    <li class="${state.filter === k ? 'active' : ''}" onclick="setFilter('${k}')">
+      <span>${c.emoji} ${esc(c.name)}</span><span>${counts[k] || 0}</span>
+    </li>`).join('');
+
+  const ranking = [...state.questions]
+    .filter((q) => !q.crisis)
+    .sort((a, b) => b.views - a.views)
+    .slice(0, 5)
+    .map((q, i) => `
+      <li onclick="go('detail','${q.id}')"><span class="rankno">${i + 1}</span>${esc(q.title.length > 30 ? q.title.slice(0, 30) + '…' : q.title)}</li>`)
+    .join('');
+
+  const myCount = state.questions.filter((q) => q.mine).length;
+
+  side.innerHTML = `
+    <div class="card">
+      <h3>あなたのステータス</h3>
+      <div class="note">知恵コイン：0枚（価値：0円）</div>
+      <div class="note">質問数：${myCount}（後悔数：${myCount}）</div>
+      <div class="note">称号：${myCount === 0 ? '傍観者' : myCount < 3 ? '迷える子羊' : myCount < 6 ? '知恵袋依存症' : '人生の大半をここで過ごす人'}</div>
+    </div>
+    <div class="card">
+      <h3>カテゴリ</h3>
+      <ul>${cats}</ul>
+    </div>
+    <div class="card">
+      <h3>今日の迷質問ランキング</h3>
+      <ul class="rk">${ranking}</ul>
+    </div>
+    <div class="card">
+      <h3>運営からのお知らせ</h3>
+      <div class="note">・違反報告は24時間受け付けています（確認は年1回です）</div>
+      <div class="note">・AIアシスタントの自信と正確性は反比例します</div>
+    </div>`;
+}
+
+/* ===================== 起動 ===================== */
+
+(function init() {
+  state.questions = load() || seedQuestions();
+  save();
+  render();
+  state.questions.forEach((q) => {
+    if (q.pending && q.pending.length) runPending(q.id);
+  });
+  setInterval(() => {
+    if (state.view === 'list') renderList();
+  }, 60000);
+})();
+</script>
+</body>
+</html>
